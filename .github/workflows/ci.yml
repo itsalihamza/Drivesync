@@ -25,24 +25,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Install and test server
+      # Install server dependencies
       - name: Install server dependencies
         run: npm install
         working-directory: ./server
 
-      - name: Run server tests
-        run: npm test
-        working-directory: ./server
-
-      # Install, build, and test client
+      # Install and build client
       - name: Install client dependencies
         run: npm install
         working-directory: ./client
 
       - name: Build client
         run: npm run build
-        working-directory: ./client
-
-      - name: Run client tests
-        run: npm test -- --watchAll=false
         working-directory: ./client

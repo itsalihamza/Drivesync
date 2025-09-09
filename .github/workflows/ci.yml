@@ -24,9 +24,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
 
-      # Install and build server
+      # Install and test server
       - name: Install server dependencies
         run: npm install
         working-directory: ./server
@@ -35,7 +34,7 @@ jobs:
         run: npm test
         working-directory: ./server
 
-      # Install and build client
+      # Install, build, and test client
       - name: Install client dependencies
         run: npm install
         working-directory: ./client

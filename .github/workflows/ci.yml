@@ -17,8 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          cache: 'npm'
+          node-version: 18   # 👈 removed "cache: npm"
 
       - name: Install dependencies (Backend)
         working-directory: ./server
@@ -28,15 +27,12 @@ jobs:
         working-directory: ./client
         run: npm install
 
-      # Skip tests (since you said you don’t have any yet)
-
       - name: Build frontend
         working-directory: ./client
         run: |
           unset CI   # prevent eslint warnings from failing build
           npm run build
 
-      # ✅ SonarCloud Scan
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         with:

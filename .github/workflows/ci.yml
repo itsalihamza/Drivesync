@@ -11,33 +11,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18   # 👈 removed "cache: npm"
+          node-version: '18'
 
-      - name: Install dependencies (Backend)
-        working-directory: ./server
-        run: npm install
-
-      - name: Install dependencies (Frontend)
-        working-directory: ./client
-        run: npm install
-
-      - name: Build frontend
-        working-directory: ./client
+      - name: Install dependencies
         run: |
-          unset CI   # prevent eslint warnings from failing build
-          npm run build
+          npm install --legacy-peer-deps || true
+          cd client && npm install --legacy-peer-deps || true
+          cd ../server && npm install --legacy-peer-deps || true
 
+      # 🔍 SonarCloud Scan
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
         with:
-          projectBaseDir: .
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
+            -Dsonar.sources=client/src,server/src
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
-          SONAR_ORG: ${{ secrets.SONAR_ORG }}

@@ -1,15 +1,49 @@
-name: CI
-on: [push, pull_request]
+name: MERN CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-  sonarcloud:
+  build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18] # or 20 if you're on Node 20
+
     steps:
-      - uses: actions/checkout@v3
+      # Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          fetch-depth: 0
-      - name: Build (example for Maven)
-        run: mvn -B -DskipTests=false package
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      # Install and build server
+      - name: Install server dependencies
+        run: npm install
+        working-directory: ./server
+
+      - name: Run server tests
+        run: npm test
+        working-directory: ./server
+
+      # Install and build client
+      - name: Install client dependencies
+        run: npm install
+        working-directory: ./client
+
+      - name: Build client
+        run: npm run build
+        working-directory: ./client
+
+      - name: Run client tests
+        run: npm test -- --watchAll=false
+        working-directory: ./client
